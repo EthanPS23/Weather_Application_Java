@@ -23,7 +23,7 @@ public class RegionDB {
     }
 
     // method to set the regions in the database
-    public static boolean SetRegions(List<Region> regions){
+    public static boolean SetRegions(Region regions){
         var result = false;
         // sql to insert into the region table. If a duplicate key exists then the values will be updated
         var sql = "INSERT INTO Region " +
@@ -32,10 +32,11 @@ public class RegionDB {
                 "('%1$s','%2$s')" +
                 "ON DUPLICATE KEY UPDATE RegionName = '%2$s';";
         var sqlStatement = "";
-        // combines sql statements if there is more than one region in the list
-        for (Region region : regions) {
-            sqlStatement += String.format(sql,region.getRegionID(),region.getRegionName());
-        }
+//        // combines sql statements if there is more than one region in the list
+//        for (Region region : regions) {
+//            sqlStatement += String.format(sql,region.getRegionID(),region.getRegionName());
+//        }
+        sqlStatement += String.format(sql,regions.getRegionID(),regions.getRegionName());
 
         result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true
 

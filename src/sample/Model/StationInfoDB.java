@@ -38,15 +38,21 @@ public class StationInfoDB {
                 "('%1$s','%2$s','%3$s','%4$s','%5$s','%6$s')" +
                 "ON DUPLICATE KEY UPDATE RegionID='%2$s',Elevation='%3$s',Latitude='%4$s',Longitude='%5$s'," +
                 "Description='%6$s';";
-        var sqlStatement = "";
+        /*var sqlStatement = "";
         // combines sql statements if there is more than one station in the list
         for (StationInfo stationInfo : stationsInfo) {
             sqlStatement += String.format(sql,stationInfo.getStationID(),stationInfo.getRegionID(),stationInfo.getElevation(),
                     stationInfo.getLatitude(),stationInfo.getLongitude(),stationInfo.getDescription());
         }
 
-        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true
+        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true*/
 
+        for (StationInfo stationInfo : stationsInfo) {
+            var sqlStatement = String.format(sql, stationInfo.getStationID(), stationInfo.getRegionID(), stationInfo.getElevation(),
+                    stationInfo.getLatitude(), stationInfo.getLongitude(), stationInfo.getDescription());
+            SQL.ExecuteUpdate(sqlStatement);
+        }
+z
         return result;
     }
 }

@@ -32,13 +32,19 @@ public class StationDB {
                 "VALUES " +
                 "('%1$s','%2$s')" +
                 "ON DUPLICATE KEY UPDATE StationName = '%2$s';";
-        var sqlStatement = "";
-        // combines sql statements if there is more than one station in the list
+        //var sqlStatement = "";
+        /*// combines sql statements if there is more than one station in the list
         for (Station station : stations) {
             sqlStatement += String.format(sql,station.getStationID(),station.getStationName());
         }
 
-        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true
+        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true*/
+
+        // combines sql statements if there is more than one station in the list
+        for (Station station : stations) {
+            var sqlStatement = String.format(sql,station.getStationID(),station.getStationName());
+            SQL.ExecuteUpdate(sqlStatement); // if the number of rows affected is 0 or more than result is true
+        }
 
         return result;
     }
