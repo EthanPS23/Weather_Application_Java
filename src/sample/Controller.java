@@ -10,6 +10,7 @@ public class Controller {
     public Controller() {
         String asd = "asda";
         String ds = "34sd" + asd;
-        DataRetrieval.GenerateLink();
+        //DataRetrieval.GenerateLink();
+        DataRetrieval.ObtainHtml("");
     }
 }
