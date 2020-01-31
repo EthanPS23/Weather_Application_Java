@@ -47,8 +47,13 @@ public class DataRetrieval {
 
             /**
              * For each region, extract the following:
-             * 1. Name
-             *
+             * 1. Region name
+             * 2. station name
+             * 3. station elevation
+             * 4. station description
+             * 5. station latitude
+             * 6. station longitude
+             * 7.
              */
             Integer i = 0; // regions have an index starting with 0
 
@@ -70,8 +75,12 @@ public class DataRetrieval {
                     // get the station name based for the given region with the station id
                     String stationName = station.getElementsByAttributeValue("id","pageContent_rptRegions_rptStations_" + i + "_lblStationName_" + j).text();
 
+                    Elements stationDataBox = regions.get(i).getElementsByClass("stationDataBox");
+
+                    String description = stationDataBox.get(j)/*.select("div[row]")*/.select("div.col-sm-10").text();
+
                     // print the station name
-                    System.out.println("\t" + stationName);
+                    System.out.println("\t" + stationName + " - " + description.substring(0,10) + "...");
                     j++;
                 }
                 // print new line
