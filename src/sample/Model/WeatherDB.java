@@ -5,7 +5,7 @@ import java.util.List;
 
 public class WeatherDB {
 
-    // method to get a list of the regions
+    /*// TODO: method to get a list of the regions
     public static List<Weather> GetWeather(){
         List<Weather> weather = null;
         try {
@@ -32,7 +32,7 @@ public class WeatherDB {
         }
 
         return  weather;
-    }
+    }*/
 
     // method to set the weather in the database
     public static boolean InsertWeather(List<Weather> weather){
@@ -44,14 +44,22 @@ public class WeatherDB {
                 "('%1$s','%2$s','%3$s','%4$s','%5$s','%6$s','%7$s','%8$s','%9$s','%10$s','%11$s','%12$s');";
         var sqlStatement = "";
         // combines sql statements if there is more than one station in the list
-        for (Weather weatherEvent : weather) {
+        /*for (Weather weatherEvent : weather) {
             sqlStatement += String.format(sql,weatherEvent.getStationID(),weatherEvent.getDate(),weatherEvent.getHour(),
                     weatherEvent.getTemp(),weatherEvent.getRel_Hum(),weatherEvent.getSnow_Pack(),weatherEvent.getSnow_New(),
                     weatherEvent.getPrecip_New(),weatherEvent.getHr_Snow(),weatherEvent.getWind_Speed(),
                     weatherEvent.getMax_Wind_Speed(),weatherEvent.getWind_Dir());
         }
 
-        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true
+        result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true*/
+
+        for (Weather weatherEvent : weather) {
+            sqlStatement = String.format(sql,weatherEvent.getStationID(),weatherEvent.getDate(),weatherEvent.getHour(),
+                    weatherEvent.getTemp(),weatherEvent.getRel_Hum(),weatherEvent.getSnow_Pack(),weatherEvent.getSnow_New(),
+                    weatherEvent.getPrecip_New(),weatherEvent.getHr_Snow(),weatherEvent.getWind_Speed(),
+                    weatherEvent.getMax_Wind_Speed(),weatherEvent.getWind_Dir());
+            result = SQL.ExecuteUpdate(sqlStatement)>=0; // TODO:if the number of rows affected is 0 or more than result is true
+        }
 
         return result;
     }

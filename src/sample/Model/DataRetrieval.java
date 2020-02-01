@@ -110,11 +110,9 @@ public class DataRetrieval {
 
     // finds the stations information
     private static void StationInfo(Element region,Integer regionNum){
-        StationInfoDB.GetStationInfo();
 
         try {
             // prepare lists for the stations
-            List<Station> stations = new ArrayList<Station>();
             List<StationInfo> stationInfos = new ArrayList<StationInfo>();
 
             // initialize variables
@@ -170,13 +168,10 @@ public class DataRetrieval {
             // add the information to the lists
             for (stationNum = 0; stationNum < stationNameStr.size(); stationNum++) {
                 // as the stationID and regionID indexes start at 1 for the sql database we need to add one to the indexes
-                stations.add(new Station(stationNum + 1,stationNameStr.get(stationNum)));
-                stationInfos.add(new StationInfo(stationNum+1, regionNum+1,elevation.get(stationNum),
-                        latitude.get(stationNum),longitude.get(stationNum),description.get(stationNum)));
+//                stations.add(new Station(stationNum + 1,stationNameStr.get(stationNum)));
+                stationInfos.add(new StationInfo(stationNum+1, regionNum+1, stationNameStr.get(stationNum),
+                        elevation.get(stationNum),latitude.get(stationNum),longitude.get(stationNum),description.get(stationNum)));
             }
-
-            // set the stations in the SQL database
-            StationDB.SetStations(stations);
 
             // set the station info in the sql database
             StationInfoDB.SetStationInfo(stationInfos);
