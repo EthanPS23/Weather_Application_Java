@@ -5,10 +5,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.print.DocFlavor;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class DataRetrieval {
@@ -70,7 +73,7 @@ public class DataRetrieval {
                 // get the list of stations for the given region
                 Element stations = regionsElements.get(regionNum)/**/;
 
-                StationData(stations, regionNum);
+                StationData(stations, regionNum); // a region contains many stations
 
                 // print new line
                 System.out.println();
@@ -91,21 +94,6 @@ public class DataRetrieval {
 
         StationInfo(region,regionNum);
 
-
-
-        /*// go through the stations for the given region to obtain the required data
-//        for (Element station:stations){
-            // get the station name based for the given region with the station id
-
-
-            Elements stationDataBox = regions.get(i).getElementsByClass("stationDataBox");
-
-            String description = stationDataBox.get(j)*//*.select("div[row]")*//*.select("div.col-sm-10").text();
-
-            // print the station name
-            System.out.println("\t" + stationName + " - " + description.substring(0,10) + "...");
-            j++;
-//        }*/
     }
 
     // finds the stations information
@@ -163,8 +151,13 @@ public class DataRetrieval {
                     latitude.add(Double.parseDouble(lat));
                     longitude.add(Double.parseDouble(lon));
                 }
-            }
+                //StationInfoDB.SetStationInfo(new StationInfo(stationNum+1,regionNum+1,))
 
+                // Obtain the station weather
+                StationWeather(stationDataBox,stationNum,regionNum);
+                stationNum++;
+            }
+            stationNum = 0;
             // add the information to the lists
             for (stationNum = 0; stationNum < stationNameStr.size(); stationNum++) {
                 // as the stationID and regionID indexes start at 1 for the sql database we need to add one to the indexes
@@ -183,7 +176,86 @@ public class DataRetrieval {
     }
 
     // obtains the stations weather
-    private  static void StationWeather(){
+    private  static void StationWeather(Element stationDataBox, Integer stationNum, Integer regionNum){
+        try{
+            List<Weather> weather = new ArrayList<Weather>();
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+            Element table = stationDataBox.select("table").first(); // currently just trying with the first table of data
+            String dateStr = table.select("caption").first().text();
+            LocalDate date = LocalDate.parse(dateStr,dateFormat);
+            Elements rows = table.select("tr");
+
+            /* As the tables for each station have different columns of data (ie wind, vs snow) I need to look at how to enter into the correct columns of the database
+            * Could use a hashmap to associate a column header to a column index. With the dictionary, we then associate the column header to the column in our database,
+            * using the key to get the column index from a table that is created containing the data of the station.
+            * If a key doesn't exist and return a null value for that column instead of trying to obtain the value from the array/list of data
+            *
+            * */
+            HashMap<String, Integer> columnHeaders = new HashMap<String, Integer>(); // to contain the column name with its column number
+            Elements firstRow = rows.get(0).select("th"); // get the table headers
+
+            
+            // go through the table headers to put into the hashtable
+            for (int i =0; i<firstRow.size(); i++){
+                columnHeaders.put(firstRow.get(i).text(),i);
+            }
+
+            for (int i = 1; i < rows.size(); i++) {
+                Elements columns =  rows.get(i).select("td"); // get the column values for row i
+                Weather entry =  new Weather();
+
+                entry.setStationID(stationNum);
+                entry.setRegionID(regionNum);
+                entry.setDate(date); // only for current test case
+
+                Integer hour = Integer.parseInt(columns.get(0).text().substring(0,2)); // the hour column is always the first column, remove the h at the end of string
+                entry.setHour(hour);
+
+                Integer temp = Integer.parseInt(columns.get(1).text()); // the temp column is always the second column
+                entry.setTemp(temp);
+
+                Integer relHumNum = columnHeaders.get("RH") != null ? columnHeaders.get("RH") : null; // check to see if there is a relative humidity column
+                Integer relHum = relHumNum == null ? null : Integer.parseInt(columns.get(relHumNum).text()); // get the relative humidity column value
+                entry.setRel_Hum(relHum);
+
+                Integer snowPackNum = columnHeaders.get("Snow Pack (cm)") != null ? columnHeaders.get("Snow Pack (cm)") : null; // check to see if there is a snow pack column
+                Integer snowPack = snowPackNum == null ? null : Integer.parseInt(columns.get(snowPackNum).text()); // get the snow pack column value
+                entry.setSnow_Pack(snowPack);
+
+                Integer snowNewNum = columnHeaders.get("Snow New (cm)") != null ? columnHeaders.get("Snow New (cm)") : null; // check to see if there is a snow new column
+                Integer snowNew = snowNewNum == null ? null : Integer.parseInt(columns.get(snowNewNum).text()); // get the snow new column value
+                entry.setSnow_New(snowNew);
+
+                Integer precipNewNum = columnHeaders.get("Precip. New (mm)") != null ? columnHeaders.get("Precip. New (mm)") : null; // check to see if there is a precip new column
+                Integer precipNew = precipNewNum == null ? null : Integer.parseInt(columns.get(precipNewNum).text()); // get the precip new column value
+                entry.setPrecip_New(precipNew);
+
+                Integer hrSnowNum = columnHeaders.get("24Hr Snow (cm)") != null ? columnHeaders.get("24Hr Snow (cm)") : null; // check to see if there is a 24 snow column
+                Integer hrSnow = hrSnowNum == null ? null : Integer.parseInt(columns.get(hrSnowNum).text()); // get the 24 snow column value
+                entry.setHr_Snow(hrSnow);
+
+                Integer windSpeedNum = columnHeaders.get("Wind Speed (km/h)") != null ? columnHeaders.get("Wind Speed (km/h)") : null; // check to see if there is a wind speed column
+                Integer windSpeed = windSpeedNum == null ? null : Integer.parseInt(columns.get(windSpeedNum).text()); // get the wind speed column value
+                entry.setWind_Speed(windSpeed);
+
+                Integer maxWindSpeedNum = columnHeaders.get("Max Wind Speed (km/h)") != null ? columnHeaders.get("Max Wind Speed (km/h)") : null; // check to see if there is a max wind speed column
+                Integer maxWindSpeed = maxWindSpeedNum == null ? null : Integer.parseInt(columns.get(maxWindSpeedNum).text()); // get the max wind speed column value
+                entry.setWind_Speed(maxWindSpeed);
+
+                Integer windDirNum = columnHeaders.get("Wind Dir.") != null ? columnHeaders.get("Wind Dir.") : null; // check to see if there is a wind dir column
+                Integer windDir = windDirNum == null ? null : Integer.parseInt(columns.get(windDirNum).text()); // get the wind dir column value
+                entry.setWind_Speed(windDir);
+
+                weather.add(entry);
+            }
+
+            stationNum++;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
