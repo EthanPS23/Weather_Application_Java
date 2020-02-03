@@ -59,7 +59,7 @@ public class WeatherDB {
     public static boolean InsertWeather(Weather weather){
         var result = false;
         // sql to insert into the weather table
-        var sql = "INSERT INTO Weather " +
+        var sql = "INSERT IGNORE INTO Weather " +
                 "(StationID,RegionID,Date,Hour,Temp,RH,Snow_Pack,Snow_New,Precip_New,24Hr_Snow,Wind_Speed,Max_Wind_Speed,Wind_Dir) " +
                 "VALUES " +
                 "(%1$s,%2$s,'%3$s',%4$s,%5$s,%6$s,%7$s,%8$s,%9$s,%10$s,%11$s,%12$s,%13$s);";
