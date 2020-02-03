@@ -107,9 +107,9 @@ public class DataRetrieval {
             Integer stationNum = 0;
             List<String> stationNameStr = new ArrayList<String>();
             List<Integer> elevation = new ArrayList<Integer>();
-            List<String> description = new ArrayList<String>();
-            List<Double> latitude = new ArrayList<Double>();
-            List<Double> longitude = new ArrayList<Double>();
+            String description;
+            Double latitude;
+            Double longitude;
 
             // Find all the stations details
             Elements stationNames = region.getElementsByClass("toggleStationDetails");
@@ -138,7 +138,7 @@ public class DataRetrieval {
                 Elements rows = stationDataBox.getElementsByClass("row");
 
                 // obtain the stations description
-                description.add(rows.select("div.col-sm-10").text());
+                description = rows.select("div.col-sm-10").text();
 
                 // begin looking for the longitude and latitude of stations
                 Elements latLong = rows.select("span");
@@ -148,26 +148,23 @@ public class DataRetrieval {
                     String lon = latLong.get(1).select("span").text();
 
                     // convert the longitude and latitude to double
-                    latitude.add(Double.parseDouble(lat));
-                    longitude.add(Double.parseDouble(lon));
+                    latitude = Double.parseDouble(lat);
+                    longitude = Double.parseDouble(lon);
                 }
-                //StationInfoDB.SetStationInfo(new StationInfo(stationNum+1,regionNum+1,))
+                else {
+                    latitude = 0.0;
+                    longitude = 0.0;
+                }
+
+                if(!StationInfoDB.SetStationInfo(new StationInfo(stationNum+1, regionNum+1,
+                        stationNameStr.get(stationNum),elevation.get(stationNum),latitude,longitude,description))){
+                    //TODO: print there was an error inserting
+                }
 
                 // Obtain the station weather
                 StationWeather(stationDataBox,stationNum,regionNum);
                 stationNum++;
             }
-            stationNum = 0;
-            // add the information to the lists
-            for (stationNum = 0; stationNum < stationNameStr.size(); stationNum++) {
-                // as the stationID and regionID indexes start at 1 for the sql database we need to add one to the indexes
-//                stations.add(new Station(stationNum + 1,stationNameStr.get(stationNum)));
-                stationInfos.add(new StationInfo(stationNum+1, regionNum+1, stationNameStr.get(stationNum),
-                        elevation.get(stationNum),latitude.get(stationNum),longitude.get(stationNum),description.get(stationNum)));
-            }
-
-            // set the station info in the sql database
-            StationInfoDB.SetStationInfo(stationInfos);
 
         }catch (Exception ex){
             ex.printStackTrace();
@@ -179,8 +176,7 @@ public class DataRetrieval {
     private  static void StationWeather(Element stationDataBox, Integer stationNum, Integer regionNum){
         try{
             List<Weather> weather = new ArrayList<Weather>();
-            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("EEE MMM d, yyyy");
 
             Element table = stationDataBox.select("table").first(); // currently just trying with the first table of data
             String dateStr = table.select("caption").first().text();
@@ -196,7 +192,6 @@ public class DataRetrieval {
             HashMap<String, Integer> columnHeaders = new HashMap<String, Integer>(); // to contain the column name with its column number
             Elements firstRow = rows.get(0).select("th"); // get the table headers
 
-            
             // go through the table headers to put into the hashtable
             for (int i =0; i<firstRow.size(); i++){
                 columnHeaders.put(firstRow.get(i).text(),i);
@@ -217,45 +212,48 @@ public class DataRetrieval {
                 entry.setTemp(temp);
 
                 Integer relHumNum = columnHeaders.get("RH") != null ? columnHeaders.get("RH") : null; // check to see if there is a relative humidity column
-                Integer relHum = relHumNum == null ? null : Integer.parseInt(columns.get(relHumNum).text()); // get the relative humidity column value
+                Integer relHum = relHumNum == null ? null : // if there is no column for RH then integer will be null
+                        columns.get(relHumNum).text().isBlank() ? null : Integer.parseInt(columns.get(relHumNum).text()); // get the relative humidity column value. If it is blank it is null
                 entry.setRel_Hum(relHum);
 
                 Integer snowPackNum = columnHeaders.get("Snow Pack (cm)") != null ? columnHeaders.get("Snow Pack (cm)") : null; // check to see if there is a snow pack column
-                Integer snowPack = snowPackNum == null ? null : Integer.parseInt(columns.get(snowPackNum).text()); // get the snow pack column value
+                Integer snowPack = snowPackNum == null ? null : // if there is no column for snow pack then integer will be null
+                        columns.get(snowPackNum).text().isBlank() ? null : Integer.parseInt(columns.get(snowPackNum).text()); // get the snow pack column value. If it is blank it is null
                 entry.setSnow_Pack(snowPack);
 
                 Integer snowNewNum = columnHeaders.get("Snow New (cm)") != null ? columnHeaders.get("Snow New (cm)") : null; // check to see if there is a snow new column
-                Integer snowNew = snowNewNum == null ? null : Integer.parseInt(columns.get(snowNewNum).text()); // get the snow new column value
+                Integer snowNew = snowNewNum == null ? null : // if there is no column for snow new then integer will be null
+                        columns.get(snowNewNum).text().isBlank() ? null : Integer.parseInt(columns.get(snowNewNum).text()); // get the snow new column value. If it is blank it is null
                 entry.setSnow_New(snowNew);
 
                 Integer precipNewNum = columnHeaders.get("Precip. New (mm)") != null ? columnHeaders.get("Precip. New (mm)") : null; // check to see if there is a precip new column
-                Integer precipNew = precipNewNum == null ? null : Integer.parseInt(columns.get(precipNewNum).text()); // get the precip new column value
+                Integer precipNew = precipNewNum == null ? null : // if there is no column for precip new then integer will be null
+                        columns.get(precipNewNum).text().isBlank() ? null : Integer.parseInt(columns.get(precipNewNum).text()); // get the precip new column value. If it is blank it is null
                 entry.setPrecip_New(precipNew);
 
                 Integer hrSnowNum = columnHeaders.get("24Hr Snow (cm)") != null ? columnHeaders.get("24Hr Snow (cm)") : null; // check to see if there is a 24 snow column
-                Integer hrSnow = hrSnowNum == null ? null : Integer.parseInt(columns.get(hrSnowNum).text()); // get the 24 snow column value
+                Integer hrSnow = hrSnowNum == null ? null : // if there is no column for 24hr snow then integer will be null
+                        columns.get(hrSnowNum).text().isBlank() ? null : Integer.parseInt(columns.get(hrSnowNum).text()); // get the 24 snow column value. If it is blank it is null
                 entry.setHr_Snow(hrSnow);
 
                 Integer windSpeedNum = columnHeaders.get("Wind Speed (km/h)") != null ? columnHeaders.get("Wind Speed (km/h)") : null; // check to see if there is a wind speed column
-                Integer windSpeed = windSpeedNum == null ? null : Integer.parseInt(columns.get(windSpeedNum).text()); // get the wind speed column value
+                Integer windSpeed = windSpeedNum == null ? null : // if there is no column for wind speed then integer will be null
+                        columns.get(windSpeedNum).text().isBlank() ? null : Integer.parseInt(columns.get(windSpeedNum).text()); // get the wind speed column value. If it is blank it is null
                 entry.setWind_Speed(windSpeed);
 
                 Integer maxWindSpeedNum = columnHeaders.get("Max Wind Speed (km/h)") != null ? columnHeaders.get("Max Wind Speed (km/h)") : null; // check to see if there is a max wind speed column
-                Integer maxWindSpeed = maxWindSpeedNum == null ? null : Integer.parseInt(columns.get(maxWindSpeedNum).text()); // get the max wind speed column value
-                entry.setWind_Speed(maxWindSpeed);
+                Integer maxWindSpeed = maxWindSpeedNum == null ? null : // if there is no column for max wind speed then integer will be null
+                        columns.get(maxWindSpeedNum).text().isBlank() ? null : Integer.parseInt(columns.get(maxWindSpeedNum).text()); // get the max wind speed column value. If it is blank it is null
+                entry.setMax_Wind_Speed(maxWindSpeed);
 
                 Integer windDirNum = columnHeaders.get("Wind Dir.") != null ? columnHeaders.get("Wind Dir.") : null; // check to see if there is a wind dir column
-                Integer windDir = windDirNum == null ? null : Integer.parseInt(columns.get(windDirNum).text()); // get the wind dir column value
-                entry.setWind_Speed(windDir);
+                String windDir = windDirNum == null ? null : columns.get(windDirNum).text(); // get the wind dir column value
+                entry.setWind_Dir(windDir);
 
                 weather.add(entry);
             }
-
-            stationNum++;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
