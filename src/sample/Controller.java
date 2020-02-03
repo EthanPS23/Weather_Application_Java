@@ -11,6 +11,7 @@ public class Controller {
         String asd = "asda";
         String ds = "34sd" + asd;
         //DataRetrieval.GenerateLink();
-        DataRetrieval.ObtainHtml("");
+        var links = DataRetrieval.GenerateLink();
+        //DataRetrieval.ObtainHtml("https://avalanche.pc.gc.ca/station-eng.aspx?d=2011-09-10");
     }
 }

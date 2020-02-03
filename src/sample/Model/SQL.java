@@ -27,6 +27,7 @@ public class SQL {
             var stmt = connection.createStatement();
             // query the database and receive the number of rows affected
             rowsAffected = stmt.executeUpdate(sql);
+            connection.close();
         }catch (Exception e) {
             e.printStackTrace();
         }
