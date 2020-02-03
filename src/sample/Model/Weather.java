@@ -1,11 +1,13 @@
 package sample.Model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Weather {
 
     private int StationID;
-    private Date Date;
+    private int RegionID;
+    private LocalDate Date;
     private int Hour;
     private int Temp;
     // the integers below are all nullable
@@ -18,8 +20,25 @@ public class Weather {
     private Integer Max_Wind_Speed;
     private String Wind_Dir;
 
-    public Weather(int stationID, java.util.Date date, int hour, int temp, Integer RH, Integer snow_Pack, Integer snow_New, Integer precip_New, Integer hr_Snow, Integer wind_Speed, Integer max_Wind_Speed, String wind_Dir) {
+    public  Weather(){
+        StationID = -1;
+        RegionID = -1;
+        Date = null;
+        Hour = -1;
+        Temp = -1;
+        Rel_Hum = null;
+        Snow_Pack = null;
+        Snow_New = null;
+        Precip_New = null;
+        Hr_Snow = null;
+        Wind_Speed = null;
+        Max_Wind_Speed = null;
+        Wind_Dir = "";
+    }
+
+    public Weather(int stationID, int regionID, LocalDate date, int hour, int temp, Integer RH, Integer snow_Pack, Integer snow_New, Integer precip_New, Integer hr_Snow, Integer wind_Speed, Integer max_Wind_Speed, String wind_Dir) {
         StationID = stationID;
+        RegionID = regionID;
         Date = date;
         Hour = hour;
         Temp = temp;
@@ -41,11 +60,19 @@ public class Weather {
         StationID = stationID;
     }
 
-    public java.util.Date getDate() {
+    public int getRegionID() {
+        return RegionID;
+    }
+
+    public void setRegionID(int regionID) {
+        RegionID = regionID;
+    }
+
+    public LocalDate getDate() {
         return Date;
     }
 
-    public void setDate(java.util.Date date) {
+    public void setDate(LocalDate date) {
         Date = date;
     }
 

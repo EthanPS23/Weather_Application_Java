@@ -39,9 +39,9 @@ public class WeatherDB {
         var result = false;
         // sql to insert into the weather table
         var sql = "INSERT INTO StationInfo " +
-                "(StationID,Date,Hour,Temp,RH,Snow_Pack,Snow_New,Precip_New,24Hr_Snow,Wind_Speed,Max_Wind_Speed,Wind_Dir) " +
+                "(StationID,RegionID,Date,Hour,Temp,RH,Snow_Pack,Snow_New,Precip_New,24Hr_Snow,Wind_Speed,Max_Wind_Speed,Wind_Dir) " +
                 "VALUES " +
-                "('%1$s','%2$s','%3$s','%4$s','%5$s','%6$s','%7$s','%8$s','%9$s','%10$s','%11$s','%12$s');";
+                "('%1$s','%2$s','%3$s','%4$s','%5$s','%6$s','%7$s','%8$s','%9$s','%10$s','%11$s','%12$s','%13$s');";
         var sqlStatement = "";
         // combines sql statements if there is more than one station in the list
         /*for (Weather weatherEvent : weather) {
@@ -54,7 +54,7 @@ public class WeatherDB {
         result = SQL.ExecuteUpdate(sqlStatement)>=0; // if the number of rows affected is 0 or more than result is true*/
 
         for (Weather weatherEvent : weather) {
-            sqlStatement = String.format(sql,weatherEvent.getStationID(),weatherEvent.getDate(),weatherEvent.getHour(),
+            sqlStatement = String.format(sql,weatherEvent.getStationID(),weatherEvent.getRegionID(),weatherEvent.getDate(),weatherEvent.getHour(),
                     weatherEvent.getTemp(),weatherEvent.getRel_Hum(),weatherEvent.getSnow_Pack(),weatherEvent.getSnow_New(),
                     weatherEvent.getPrecip_New(),weatherEvent.getHr_Snow(),weatherEvent.getWind_Speed(),
                     weatherEvent.getMax_Wind_Speed(),weatherEvent.getWind_Dir());
