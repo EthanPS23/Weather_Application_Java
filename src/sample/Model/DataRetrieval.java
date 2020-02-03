@@ -201,8 +201,8 @@ public class DataRetrieval {
                 Elements columns =  rows.get(i).select("td"); // get the column values for row i
                 Weather entry =  new Weather();
 
-                entry.setStationID(stationNum);
-                entry.setRegionID(regionNum);
+                entry.setStationID(stationNum+1);
+                entry.setRegionID(regionNum+1);
                 entry.setDate(date); // only for current test case
 
                 Integer hour = Integer.parseInt(columns.get(0).text().substring(0,2)); // the hour column is always the first column, remove the h at the end of string
@@ -247,10 +247,10 @@ public class DataRetrieval {
                 entry.setMax_Wind_Speed(maxWindSpeed);
 
                 Integer windDirNum = columnHeaders.get("Wind Dir.") != null ? columnHeaders.get("Wind Dir.") : null; // check to see if there is a wind dir column
-                String windDir = windDirNum == null ? null : columns.get(windDirNum).text(); // get the wind dir column value
+                String windDir = windDirNum == null ? null : "'" + columns.get(windDirNum).text() + "'"; // get the wind dir column value
                 entry.setWind_Dir(windDir);
 
-                weather.add(entry);
+                WeatherDB.InsertWeather(entry);
             }
         } catch (Exception e) {
             e.printStackTrace();
